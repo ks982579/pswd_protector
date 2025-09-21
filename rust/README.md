@@ -13,13 +13,38 @@ A secure, PIN-protected command-line password manager built in Rust.
 
 ## Installation
 
+### Easy Installation (Linux)
+
 1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   cd pswd_protector/rust
+   ```
+
+2. Run the installer:
+   ```bash
+   ./install.sh
+   ```
+
+The installer will:
+
+- Build the project in release mode
+- Install the binary to `~/.local/bin/pswdstore`
+- Test the installation
+- Provide setup instructions if PATH configuration is needed
+
+### Manual Installation
+
+1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd pswd_protector/rust
    ```
 
 2. Build the project:
+
    ```bash
    cargo build --release
    ```
@@ -50,6 +75,7 @@ pswdstore 1234 --new
 ```
 
 You'll be prompted interactively for:
+
 - Domain (e.g., "github.com")
 - Username
 - Password (with confirmation)
@@ -57,6 +83,7 @@ You'll be prompted interactively for:
 - Security questions (optional, multiple allowed)
 
 Example session:
+
 ```
 Creating new password entry...
 
@@ -81,6 +108,7 @@ pswdstore 1234 --get github
 ```
 
 **Single match** - goes directly to interaction menu:
+
 ```
 What would you like to do with github.com?
 ❯ Copy password to clipboard
@@ -90,6 +118,7 @@ What would you like to do with github.com?
 ```
 
 **Multiple matches** - choose which account:
+
 ```
 Found 2 matching entries:
 
@@ -106,6 +135,7 @@ pswdstore 1234 --list github
 ```
 
 Example output:
+
 ```
 Found 1 matching entry:
 
@@ -117,6 +147,7 @@ Security Questions: 1 question(s) stored
 ```
 
 **List all entries:**
+
 ```bash
 pswdstore 1234 --list
 ```
@@ -128,6 +159,7 @@ pswdstore 1234 --update github
 ```
 
 **Single match** - goes directly to update options:
+
 ```
 What would you like to update for john_doe (github.com)?
 ❯ Update password
@@ -137,6 +169,7 @@ What would you like to update for john_doe (github.com)?
 ```
 
 **Multiple matches** - choose which account to update:
+
 ```
 Found 2 matching entries:
 1. personal_account (github.com)
@@ -146,6 +179,7 @@ Found 2 matching entries:
 ```
 
 **Update options:**
+
 - **Password**: Secure password change with confirmation
 - **Email**: Add, change, or remove email address
 - **Security Questions**: Add new, replace all, or remove all
@@ -157,6 +191,7 @@ pswdstore 1234 --destroy github
 ```
 
 **Selection and confirmation process:**
+
 ```
 Found 2 matching entries:
 1. personal_account for github.com
@@ -175,8 +210,9 @@ Security Questions: 2
 ```
 
 Search terms match against:
+
 - Domain names
-- Usernames  
+- Usernames
 - Email addresses
 
 ## Security
@@ -202,6 +238,7 @@ Search terms match against:
 ### Wrong PIN Protection
 
 If an incorrect PIN is provided:
+
 - Decryption will fail with "Decryption failed - invalid PIN"
 - Even if somehow decrypted, PIN hash verification will fail
 - No sensitive data is exposed
@@ -222,7 +259,7 @@ The encrypted JSON file contains:
     "updated": [
       {
         "action": "new",
-        "datetime": "2024-01-01T12:30:00Z", 
+        "datetime": "2024-01-01T12:30:00Z",
         "user": "username"
       }
     ]
@@ -246,16 +283,16 @@ The encrypted JSON file contains:
 
 ## Command Reference
 
-| Command | Description |
-|---------|-------------|
-| `pswdstore <pin> --init` | Initialize new password store |
-| `pswdstore <pin> --new` | Add new password entry (interactive) |
-| `pswdstore <pin> --get <term>` | Search for passwords (interactive mode with clipboard/reveal options) |
-| `pswdstore <pin> --list [term]` | List passwords safely (passwords hidden) |
-| `pswdstore <pin> --update <term>` | Update existing password entry (password/email/security questions) |
-| `pswdstore <pin> --destroy <term>` | Delete password entry (permanent, with confirmation) |
-| `pswdstore --help` | Show help information |
-| `pswdstore --version` | Show version information |
+| Command                            | Description                                                           |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| `pswdstore <pin> --init`           | Initialize new password store                                         |
+| `pswdstore <pin> --new`            | Add new password entry (interactive)                                  |
+| `pswdstore <pin> --get <term>`     | Search for passwords (interactive mode with clipboard/reveal options) |
+| `pswdstore <pin> --list [term]`    | List passwords safely (passwords hidden)                              |
+| `pswdstore <pin> --update <term>`  | Update existing password entry (password/email/security questions)    |
+| `pswdstore <pin> --destroy <term>` | Delete password entry (permanent, with confirmation)                  |
+| `pswdstore --help`                 | Show help information                                                 |
+| `pswdstore --version`              | Show version information                                              |
 
 ## Examples
 
@@ -327,6 +364,7 @@ Username: old_user
 ## File Location
 
 The encrypted password store is saved as:
+
 - **Linux/macOS**: `~/.pswdstore.json`
 - **Windows**: `%USERPROFILE%\.pswdstore.json`
 
@@ -390,17 +428,21 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ### Common Issues
 
 **"Password store not found"**
+
 - Run `pswdstore <pin> --init` first
 
-**"Invalid PIN"** 
+**"Invalid PIN"**
+
 - Check your PIN is correct
 - Ensure caps lock is not on
 
 **"Permission denied"**
+
 - Check file permissions on `~/.pswdstore.json`
 - Ensure you have write access to home directory
 
 **"Decryption failed"**
+
 - PIN is incorrect
 - File may be corrupted (restore from backup)
 

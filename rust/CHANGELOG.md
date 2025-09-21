@@ -5,9 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2024-01-01
+## [0.1.0] - 2025-09-21
 
 ### Added
+
 - Initial release of pswdstore CLI password manager
 - PIN-based AES-256-GCM encryption for secure password storage
 - Interactive password entry with confirmation
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (Linux, macOS, Windows)
 
 ### Security Features
+
 - AES-256-GCM encryption with randomly generated nonces
 - PIN-derived encryption keys using SHA-256 with salt
 - No plaintext storage of sensitive data
@@ -33,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Audit trail for all operations
 
 ### Commands
+
 - `pswdstore <pin> --init` - Initialize new encrypted password store
 - `pswdstore <pin> --new` - Create new password entry interactively
 - `pswdstore <pin> --get <search_term>` - Search and display matching passwords
@@ -40,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pswdstore --version` - Show version information
 
 ### Dependencies
+
 - clap 4.4 - Command line argument parsing
 - dialoguer 0.11 - Interactive terminal prompts
 - serde 1.0 + serde_json 1.0 - JSON serialization
@@ -51,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dirs 5.0 - Cross-platform directory utilities
 
 ### Data Structure
+
 - Structured JSON format with metadata and data sections
 - Creation and update logs with user attribution
 - Flexible password entry schema supporting optional fields
@@ -59,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timestamp tracking for all operations
 
 ### Technical Details
+
 - Rust 2021 edition
 - Memory-safe password handling
 - Encrypted file storage at `~/.pswdstore.json`
@@ -67,14 +73,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Graceful error handling and user feedback
 - Cross-platform compatibility
 
-## [0.1.1] - 2025-01-21
+## [0.1.1] - 2025-09-21
 
 ### 🔒 Security (Critical Fix)
+
 - **FIXED**: Critical security vulnerability where passwords were displayed in terminal output
 - **FIXED**: Passwords no longer stored in terminal history or system logs
 - **ADDED**: Terminal history protection - passwords never displayed unless explicitly requested
 
 ### Added
+
 - Interactive password access with secure options:
   - Copy to clipboard (most secure option)
   - Show password with explicit warning and confirmation
@@ -86,12 +94,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better handling of multiple accounts for same domain
 
 ### Changed
+
 - Password display behavior completely redesigned for security
 - Search results now show entries safely with passwords hidden by default
 - Interactive menus for password access instead of direct terminal output
 - Improved user experience for multiple matching entries
 
 ### Security Enhancements
+
 - Passwords displayed as `[HIDDEN - use interactive mode to reveal]` in listings
 - Explicit warnings before showing passwords on screen
 - Secure clipboard copying as primary access method
@@ -99,11 +109,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactive confirmation required for any password visibility
 
 ### Dependencies
+
 - **ADDED**: `arboard` 3.2 for secure clipboard functionality
 
-## [0.1.2] - 2025-01-21
+## [0.1.2] - 2025-09-21
 
 ### Added
+
 - **Update functionality** (`--update <search>`) for modifying existing password entries
   - Interactive field selection: password, email, or security questions
   - Secure password updates with confirmation prompts
@@ -119,25 +131,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved user experience with detailed confirmation prompts
 
 ### Changed
+
 - Entry selection now displays as "username (domain)" for updates
 - Entry selection displays as "username for domain" for deletions
 - Enhanced error handling and user feedback for all operations
 
 ### Security Enhancements
+
 - All update operations require explicit confirmation
 - Delete operations include multiple safety confirmations
 - Permanent action warnings prevent accidental data loss
 - Full audit trail for all modifications and deletions
 
 ### Technical Improvements
+
 - Added `update_entry()` and `delete_entry()` methods to PasswordStore
 - Implemented comprehensive search and selection logic
 - Enhanced interactive prompts for better user experience
 - Automatic data persistence after all modifications
 
+## [0.1.3] - 2025-09-21
+
+### Added
+
+- **Linux installer script** (`install.sh`) for easy installation
+  - Automated build and installation process
+  - Installs to `~/.local/bin/pswdstore` (standard Linux user binary location)
+  - Colorized output with progress indicators and emojis
+  - Comprehensive error checking and validation
+  - PATH configuration guidance if needed
+  - Quick start guide with example commands
+  - Security reminders and best practices
+- Installation verification with automatic testing
+- User-friendly setup instructions and troubleshooting
+
+### Changed
+
+- Updated README.md with Easy Installation section featuring the new installer
+- Improved installation documentation with both automated and manual options
+
+### Technical Improvements
+
+- Automated release build process
+- Binary installation with proper permissions
+- Installation directory creation if needed
+- Comprehensive pre-flight checks (Rust installation, project structure)
+
 ## [Unreleased]
 
 ### Planned Features
+
 - Import/export features
 - Password generation utilities
 - Backup and restore commands
@@ -148,6 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI scripting support
 
 ### Security Enhancements (Planned)
+
 - Optional two-factor authentication
 - Password expiration tracking
 - Breach detection integration
@@ -159,39 +203,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Summary
 
-| Version | Date | Description |
-|---------|------|-------------|
-| 0.1.2 | 2025-01-21 | Added update and delete functionality with enhanced security |
-| 0.1.1 | 2025-01-21 | Critical security fix: terminal history protection |
-| 0.1.0 | 2024-01-01 | Initial release with core password storage and encryption |
+| Version | Date       | Description                                                  |
+| ------- | ---------- | ------------------------------------------------------------ |
+| 0.1.3   | 2025-09-21 | Added Linux installer script for easy installation           |
+| 0.1.2   | 2025-09-21 | Added update and delete functionality with enhanced security |
+| 0.1.1   | 2025-09-21 | Critical security fix: terminal history protection           |
+| 0.1.0   | 2024-09-21 | Initial release with core password storage and encryption    |
 
 ---
 
 ## Release Notes
+
+### Version 0.1.3
+
+This release focuses on **ease of installation** with a professional-grade installer script for Linux users.
+
+**📦 Installation Made Easy:**
+
+- **One-Command Installation**: Simply run `./install.sh` for complete setup
+- **Automated Process**: Builds, installs, and tests the binary automatically
+- **Smart PATH Handling**: Provides guidance if PATH configuration is needed
+- **User-Friendly Output**: Colorized progress indicators and helpful messaging
+
+**🔧 Installation Features:**
+
+- **Standard Location**: Installs to `~/.local/bin/pswdstore` (follows Linux conventions)
+- **Error Prevention**: Comprehensive checks for Rust, project structure, and dependencies
+- **Installation Verification**: Automatically tests the installed binary
+- **Setup Guidance**: Provides quick start instructions and security reminders
+
+**📚 Documentation Updates:**
+
+- **Easy Installation Section**: Clear instructions for the new installer
+- **Manual Installation**: Retained for users who prefer manual setup
+- **Improved User Experience**: Streamlined onboarding process
+
+**🎯 Perfect For:**
+
+- **New Users**: Get started quickly without complex build procedures
+- **System Administrators**: Standardized installation process
+- **CI/CD Pipelines**: Scriptable installation for automated deployments
+
+This release makes pswdstore accessible to users of all technical levels with professional installation experience.
 
 ### Version 0.1.2
 
 This release completes the core password management functionality by adding comprehensive **update** and **delete** capabilities with enhanced security measures.
 
 **🔧 New Features:**
+
 - **Password Entry Updates**: Modify passwords, emails, and security questions on existing entries
 - **Safe Entry Deletion**: Remove password entries with multiple confirmation steps
 - **Multiple Account Support**: Handle multiple accounts per domain with clear identification
 - **Interactive Field Selection**: Choose exactly what to update without affecting other fields
 
 **🛡️ Security Enhancements:**
+
 - **Confirmation Prompts**: All updates require explicit confirmation
 - **Permanent Action Warnings**: Delete operations include clear warnings about data loss
 - **Audit Trail**: All modifications and deletions are logged with timestamps
 - **Safe Cancellation**: Users can cancel operations at any point
 
 **📋 Use Cases:**
+
 - **Password Changes**: Easily update passwords when they expire or are compromised
 - **Account Cleanup**: Remove old or unused accounts safely
 - **Information Updates**: Modify email addresses and security questions as needed
 - **Multiple Accounts**: Manage multiple accounts per domain (e.g., personal and work GitHub accounts)
 
 **🎯 Perfect For:**
+
 - Regular password rotation and security maintenance
 - Cleaning up old accounts and services
 - Managing complex account structures with multiple logins per service
@@ -201,17 +282,20 @@ This release completes the core password management functionality by adding comp
 This is a **critical security update** that addresses a significant vulnerability in password display behavior. **All users should upgrade immediately.**
 
 **🚨 Security Fix:**
+
 - Resolved critical issue where passwords were displayed directly in terminal output
 - Eliminated risk of passwords being stored in terminal history, system logs, or scrollback buffers
 - Implemented comprehensive terminal history protection
 
 **🔧 Improvements:**
+
 - Added secure clipboard integration for password access
 - Introduced interactive password handling with explicit user confirmation
 - Enhanced support for multiple accounts per domain
 - Improved overall user experience with safer default behaviors
 
 **📋 New Commands:**
+
 - `--list`: Browse passwords safely with sensitive data hidden
 - Enhanced `--get`: Interactive mode with clipboard copying and secure reveal options
 
@@ -226,6 +310,7 @@ No migration needed. Existing password stores work unchanged with enhanced secur
 This is the initial release of pswdstore, a secure CLI password manager built in Rust. The focus of this release was establishing a solid foundation for password storage with strong encryption and a user-friendly interface.
 
 **Key Highlights:**
+
 - Military-grade AES-256-GCM encryption
 - Interactive password entry process
 - Comprehensive search capabilities
@@ -237,6 +322,7 @@ This is the initial release of pswdstore, a secure CLI password manager built in
 This release prioritizes security with multiple layers of protection including encryption, PIN hashing, and verification. The tool is designed to be both secure and user-friendly for daily password management needs.
 
 **Getting Started:**
+
 1. Initialize your password store: `pswdstore <pin> --init`
 2. Add your first password: `pswdstore <pin> --new`
 3. Search for passwords: `pswdstore <pin> --get <term>`
@@ -248,6 +334,7 @@ For detailed documentation, see [README.md](README.md).
 ## Contributing to Changelog
 
 When contributing changes, please:
+
 1. Add entries under the `[Unreleased]` section
 2. Follow the format: `### Category` followed by `- Description`
 3. Use categories: Added, Changed, Deprecated, Removed, Fixed, Security

@@ -506,7 +506,7 @@ fn handle_delete_entry(store: &mut PasswordStore, search_term: &str) -> Result<(
 
 fn main() {
     let matches = Command::new("pswdstore")
-        .version("0.1.2")
+        .version("0.1.3")
         .about("A PIN-secured CLI password storage tool")
         .arg(
             Arg::new("pin")
