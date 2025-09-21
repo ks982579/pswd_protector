@@ -101,11 +101,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 - **ADDED**: `arboard` 3.2 for secure clipboard functionality
 
+## [0.1.2] - 2025-01-21
+
+### Added
+- **Update functionality** (`--update <search>`) for modifying existing password entries
+  - Interactive field selection: password, email, or security questions
+  - Secure password updates with confirmation prompts
+  - Email management: add, change, or remove email addresses
+  - Security questions management: add new, replace all, or remove all
+  - Multiple account support with clear username/domain identification
+- **Delete functionality** (`--destroy <search>`) for removing password entries
+  - Interactive entry selection for multiple matches
+  - Comprehensive entry preview before deletion
+  - Multi-step confirmation process with permanent action warnings
+  - Safe cancellation at any point in the process
+- Enhanced audit logging for all update and delete operations
+- Improved user experience with detailed confirmation prompts
+
+### Changed
+- Entry selection now displays as "username (domain)" for updates
+- Entry selection displays as "username for domain" for deletions
+- Enhanced error handling and user feedback for all operations
+
+### Security Enhancements
+- All update operations require explicit confirmation
+- Delete operations include multiple safety confirmations
+- Permanent action warnings prevent accidental data loss
+- Full audit trail for all modifications and deletions
+
+### Technical Improvements
+- Added `update_entry()` and `delete_entry()` methods to PasswordStore
+- Implemented comprehensive search and selection logic
+- Enhanced interactive prompts for better user experience
+- Automatic data persistence after all modifications
+
 ## [Unreleased]
 
 ### Planned Features
-- Password update functionality
-- Password deletion capability
 - Import/export features
 - Password generation utilities
 - Backup and restore commands
@@ -129,12 +161,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.1.2 | 2025-01-21 | Added update and delete functionality with enhanced security |
 | 0.1.1 | 2025-01-21 | Critical security fix: terminal history protection |
 | 0.1.0 | 2024-01-01 | Initial release with core password storage and encryption |
 
 ---
 
 ## Release Notes
+
+### Version 0.1.2
+
+This release completes the core password management functionality by adding comprehensive **update** and **delete** capabilities with enhanced security measures.
+
+**🔧 New Features:**
+- **Password Entry Updates**: Modify passwords, emails, and security questions on existing entries
+- **Safe Entry Deletion**: Remove password entries with multiple confirmation steps
+- **Multiple Account Support**: Handle multiple accounts per domain with clear identification
+- **Interactive Field Selection**: Choose exactly what to update without affecting other fields
+
+**🛡️ Security Enhancements:**
+- **Confirmation Prompts**: All updates require explicit confirmation
+- **Permanent Action Warnings**: Delete operations include clear warnings about data loss
+- **Audit Trail**: All modifications and deletions are logged with timestamps
+- **Safe Cancellation**: Users can cancel operations at any point
+
+**📋 Use Cases:**
+- **Password Changes**: Easily update passwords when they expire or are compromised
+- **Account Cleanup**: Remove old or unused accounts safely
+- **Information Updates**: Modify email addresses and security questions as needed
+- **Multiple Accounts**: Manage multiple accounts per domain (e.g., personal and work GitHub accounts)
+
+**🎯 Perfect For:**
+- Regular password rotation and security maintenance
+- Cleaning up old accounts and services
+- Managing complex account structures with multiple logins per service
 
 ### Version 0.1.1
 

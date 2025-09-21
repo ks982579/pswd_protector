@@ -121,6 +121,59 @@ Security Questions: 1 question(s) stored
 pswdstore 1234 --list
 ```
 
+### Update Password Entries
+
+```bash
+pswdstore 1234 --update github
+```
+
+**Single match** - goes directly to update options:
+```
+What would you like to update for john_doe (github.com)?
+❯ Update password
+  Update email
+  Update security questions
+  Cancel
+```
+
+**Multiple matches** - choose which account to update:
+```
+Found 2 matching entries:
+1. personal_account (github.com)
+2. work_account (github.com)
+
+? Select entry to update ›
+```
+
+**Update options:**
+- **Password**: Secure password change with confirmation
+- **Email**: Add, change, or remove email address
+- **Security Questions**: Add new, replace all, or remove all
+
+### Delete Password Entries
+
+```bash
+pswdstore 1234 --destroy github
+```
+
+**Selection and confirmation process:**
+```
+Found 2 matching entries:
+1. personal_account for github.com
+2. work_account for github.com
+
+? Select entry to delete ›
+
+⚠️  You are about to delete:
+Domain: github.com
+Username: personal_account
+Email: john@personal.com
+Security Questions: 2
+
+🚨 This action is PERMANENT and CANNOT be undone!
+? Are you absolutely sure you want to delete this entry? (y/n) ›
+```
+
 Search terms match against:
 - Domain names
 - Usernames  
@@ -199,6 +252,8 @@ The encrypted JSON file contains:
 | `pswdstore <pin> --new` | Add new password entry (interactive) |
 | `pswdstore <pin> --get <term>` | Search for passwords (interactive mode with clipboard/reveal options) |
 | `pswdstore <pin> --list [term]` | List passwords safely (passwords hidden) |
+| `pswdstore <pin> --update <term>` | Update existing password entry (password/email/security questions) |
+| `pswdstore <pin> --destroy <term>` | Delete password entry (permanent, with confirmation) |
 | `pswdstore --help` | Show help information |
 | `pswdstore --version` | Show version information |
 
@@ -250,6 +305,23 @@ Found 2 matching entries:
 2. nelnet.com (my_account)
 
 ? Select an entry to interact with ›
+
+# 6. Update a password
+$ pswdstore mypin123 --update gmail
+What would you like to update for john.doe@gmail.com (gmail.com)?
+❯ Update password
+  Update email
+  Update security questions
+  Cancel
+
+# 7. Delete an entry (careful!)
+$ pswdstore mypin123 --destroy old-site
+⚠️  You are about to delete:
+Domain: old-site.com
+Username: old_user
+🚨 This action is PERMANENT and CANNOT be undone!
+? Are you absolutely sure you want to delete this entry? (y/n) › y
+✓ Deleted entry for old_user (old-site.com)
 ```
 
 ## File Location

@@ -109,6 +109,31 @@ impl PasswordStore {
             })
             .collect()
     }
+
+    fn update_entry(&mut self, index: usize, updated_entry: PasswordEntry) {
+        if index < self.data.len() {
+            self.data[index] = updated_entry;
+            self.logs.updated.push(LogEntry {
+                action: "update".to_string(),
+                datetime: Utc::now(),
+                user: whoami::username(),
+            });
+        }
+    }
+
+    fn delete_entry(&mut self, index: usize) -> Option<PasswordEntry> {
+        if index < self.data.len() {
+            let removed = self.data.remove(index);
+            self.logs.updated.push(LogEntry {
+                action: "delete".to_string(),
+                datetime: Utc::now(),
+                user: whoami::username(),
+            });
+            Some(removed)
+        } else {
+            None
+        }
+    }
 }
 
 fn hash_pin(pin: &str) -> String {
@@ -298,9 +323,190 @@ fn handle_entry_interaction(entry: &PasswordEntry) -> Result<(), Box<dyn std::er
     Ok(())
 }
 
+fn handle_update_entry(store: &mut PasswordStore, search_term: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let results: Vec<_> = store.data.iter()
+        .enumerate()
+        .filter(|(_, entry)| {
+            entry.domain.to_lowercase().contains(&search_term.to_lowercase()) ||
+            entry.username.to_lowercase().contains(&search_term.to_lowercase()) ||
+            entry.email.as_ref().map_or(false, |email| 
+                email.to_lowercase().contains(&search_term.to_lowercase()))
+        })
+        .collect();
+    
+    if results.is_empty() {
+        println!("No entries found matching '{}'", search_term);
+        return Ok(());
+    }
+    
+    let (selected_index, selected_entry) = if results.len() == 1 {
+        results[0]
+    } else {
+        println!("Found {} matching entries:", results.len());
+        let options: Vec<String> = results.iter()
+            .map(|(_, entry)| format!("{} ({})", entry.username, entry.domain))
+            .collect();
+        
+        let selection = Select::new()
+            .with_prompt("Select entry to update")
+            .items(&options)
+            .interact()?;
+        
+        results[selection]
+    };
+    
+    let update_options = vec![
+        "Update password",
+        "Update email",
+        "Update security questions",
+        "Cancel"
+    ];
+    
+    let update_choice = Select::new()
+        .with_prompt(&format!("What would you like to update for {} ({})?", selected_entry.username, selected_entry.domain))
+        .items(&update_options)
+        .interact()?;
+    
+    let mut updated_entry = selected_entry.clone();
+    
+    match update_choice {
+        0 => {
+            let new_password = Password::new()
+                .with_prompt("New password")
+                .with_confirmation("Confirm new password", "Passwords don't match")
+                .interact()?;
+            updated_entry.password = new_password;
+            println!("✓ Password updated for {} ({})", updated_entry.username, updated_entry.domain);
+        }
+        1 => {
+            let current_email = updated_entry.email.as_deref().unwrap_or("[none]");
+            println!("Current email: {}", current_email);
+            
+            if Confirm::new().with_prompt("Remove email address?").interact()? {
+                updated_entry.email = None;
+                println!("✓ Email removed for {} ({})", updated_entry.username, updated_entry.domain);
+            } else {
+                let new_email: String = Input::new()
+                    .with_prompt("New email")
+                    .interact()?;
+                updated_entry.email = Some(new_email);
+                println!("✓ Email updated for {} ({})", updated_entry.username, updated_entry.domain);
+            }
+        }
+        2 => {
+            println!("Current security questions: {}", updated_entry.security_questions.len());
+            
+            let sq_options = vec![
+                "Add new security question",
+                "Replace all security questions",
+                "Remove all security questions",
+                "Cancel"
+            ];
+            
+            let sq_choice = Select::new()
+                .with_prompt("Security questions options")
+                .items(&sq_options)
+                .interact()?;
+            
+            match sq_choice {
+                0 => {
+                    let question: String = Input::new()
+                        .with_prompt("Security question")
+                        .interact()?;
+                    let answer: String = Input::new()
+                        .with_prompt("Answer")
+                        .interact()?;
+                    updated_entry.security_questions.push(SecurityQuestion { question, answer });
+                    println!("✓ Security question added");
+                }
+                1 => {
+                    updated_entry.security_questions.clear();
+                    while Confirm::new().with_prompt("Add a security question?").interact()? {
+                        let question: String = Input::new()
+                            .with_prompt("Security question")
+                            .interact()?;
+                        let answer: String = Input::new()
+                            .with_prompt("Answer")
+                            .interact()?;
+                        updated_entry.security_questions.push(SecurityQuestion { question, answer });
+                    }
+                    println!("✓ Security questions replaced");
+                }
+                2 => {
+                    updated_entry.security_questions.clear();
+                    println!("✓ All security questions removed");
+                }
+                _ => return Ok(()),
+            }
+        }
+        _ => return Ok(()),
+    }
+    
+    store.update_entry(selected_index, updated_entry);
+    Ok(())
+}
+
+fn handle_delete_entry(store: &mut PasswordStore, search_term: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let results: Vec<_> = store.data.iter()
+        .enumerate()
+        .filter(|(_, entry)| {
+            entry.domain.to_lowercase().contains(&search_term.to_lowercase()) ||
+            entry.username.to_lowercase().contains(&search_term.to_lowercase()) ||
+            entry.email.as_ref().map_or(false, |email| 
+                email.to_lowercase().contains(&search_term.to_lowercase()))
+        })
+        .collect();
+    
+    if results.is_empty() {
+        println!("No entries found matching '{}'", search_term);
+        return Ok(());
+    }
+    
+    let (selected_index, selected_entry) = if results.len() == 1 {
+        results[0]
+    } else {
+        println!("Found {} matching entries:", results.len());
+        let options: Vec<String> = results.iter()
+            .map(|(_, entry)| format!("{} for {}", entry.username, entry.domain))
+            .collect();
+        
+        let selection = Select::new()
+            .with_prompt("Select entry to delete")
+            .items(&options)
+            .interact()?;
+        
+        results[selection]
+    };
+    
+    println!("\n⚠️  You are about to delete:");
+    println!("Domain: {}", selected_entry.domain);
+    println!("Username: {}", selected_entry.username);
+    if let Some(email) = &selected_entry.email {
+        println!("Email: {}", email);
+    }
+    println!("Security Questions: {}", selected_entry.security_questions.len());
+    
+    println!("\n🚨 This action is PERMANENT and CANNOT be undone!");
+    
+    if Confirm::new()
+        .with_prompt("Are you absolutely sure you want to delete this entry?")
+        .interact()? 
+    {
+        if let Some(deleted_entry) = store.delete_entry(selected_index) {
+            println!("✓ Deleted entry for {} ({})", deleted_entry.username, deleted_entry.domain);
+        } else {
+            println!("✗ Failed to delete entry");
+        }
+    } else {
+        println!("Deletion cancelled");
+    }
+    
+    Ok(())
+}
+
 fn main() {
     let matches = Command::new("pswdstore")
-        .version("0.1.1")
+        .version("0.1.2")
         .about("A PIN-secured CLI password storage tool")
         .arg(
             Arg::new("pin")
@@ -333,6 +539,20 @@ fn main() {
                 .help("List password entries (safe display)")
                 .value_name("SEARCH_TERM")
                 .num_args(0..=1),
+        )
+        .arg(
+            Arg::new("update")
+                .long("update")
+                .help("Update an existing password entry")
+                .value_name("SEARCH_TERM")
+                .num_args(1),
+        )
+        .arg(
+            Arg::new("destroy")
+                .long("destroy")
+                .help("Delete a password entry (permanent)")
+                .value_name("SEARCH_TERM")
+                .num_args(1),
         )
         .get_matches();
 
@@ -436,6 +656,26 @@ fn main() {
             for entry in &store.data {
                 display_entry_safely(entry);
             }
+        }
+    } else if let Some(search_term) = matches.get_one::<String>("update") {
+        match handle_update_entry(&mut store, search_term) {
+            Ok(_) => {
+                match store.save_encrypted(&storage_path, pin) {
+                    Ok(_) => {},
+                    Err(e) => eprintln!("Error saving updated password store: {}", e),
+                }
+            }
+            Err(e) => eprintln!("Error updating entry: {}", e),
+        }
+    } else if let Some(search_term) = matches.get_one::<String>("destroy") {
+        match handle_delete_entry(&mut store, search_term) {
+            Ok(_) => {
+                match store.save_encrypted(&storage_path, pin) {
+                    Ok(_) => {},
+                    Err(e) => eprintln!("Error saving password store after deletion: {}", e),
+                }
+            }
+            Err(e) => eprintln!("Error deleting entry: {}", e),
         }
     } else {
         println!("Use --help to see available commands");
