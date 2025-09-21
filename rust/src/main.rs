@@ -2,10 +2,11 @@ use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
     Aes256Gcm, Nonce, Key
 };
+use arboard::Clipboard;
 use base64::{Engine as _, engine::general_purpose};
 use chrono::{DateTime, Utc};
 use clap::{Arg, Command};
-use dialoguer::{Input, Password, Confirm};
+use dialoguer::{Input, Password, Confirm, Select};
 use serde::{Deserialize, Serialize};
 use sha2::{Sha256, Digest};
 use std::fs;
@@ -222,28 +223,84 @@ fn interactive_new_entry() -> Result<PasswordEntry, Box<dyn std::error::Error>> 
     })
 }
 
-fn display_entry(entry: &PasswordEntry) {
+fn display_entry_safely(entry: &PasswordEntry) {
     println!("Domain: {}", entry.domain);
     println!("Username: {}", entry.username);
-    println!("Password: {}", entry.password);
+    println!("Password: [HIDDEN - use interactive mode to reveal]");
     
     if let Some(email) = &entry.email {
         println!("Email: {}", email);
     }
     
     if !entry.security_questions.is_empty() {
-        println!("Security Questions:");
-        for (i, sq) in entry.security_questions.iter().enumerate() {
-            println!("  {}. Q: {}", i + 1, sq.question);
-            println!("     A: {}", sq.answer);
-        }
+        println!("Security Questions: {} question(s) stored", entry.security_questions.len());
     }
     println!();
 }
 
+fn handle_entry_interaction(entry: &PasswordEntry) -> Result<(), Box<dyn std::error::Error>> {
+    let options = vec![
+        "Copy password to clipboard",
+        "Show password (will be visible)",
+        "Show security questions",
+        "Back to search results"
+    ];
+    
+    loop {
+        let selection = Select::new()
+            .with_prompt(&format!("What would you like to do with {}?", entry.domain))
+            .items(&options)
+            .default(0)
+            .interact()?;
+        
+        match selection {
+            0 => {
+                match Clipboard::new() {
+                    Ok(mut clipboard) => {
+                        match clipboard.set_text(&entry.password) {
+                            Ok(_) => {
+                                println!("✓ Password copied to clipboard!");
+                                println!("⚠️  Remember to clear clipboard when done");
+                            }
+                            Err(_) => println!("✗ Failed to copy to clipboard")
+                        }
+                    }
+                    Err(_) => println!("✗ Clipboard not available on this system")
+                }
+            }
+            1 => {
+                println!("\n⚠️  PASSWORD WILL BE VISIBLE ON SCREEN!");
+                if Confirm::new().with_prompt("Continue?").interact()? {
+                    println!("Password: {}", entry.password);
+                    println!("Press Enter to continue...");
+                    std::io::stdin().read_line(&mut String::new())?;
+                }
+            }
+            2 => {
+                if entry.security_questions.is_empty() {
+                    println!("No security questions stored for this entry.");
+                } else {
+                    println!("\nSecurity Questions:");
+                    for (i, sq) in entry.security_questions.iter().enumerate() {
+                        println!("  {}. Q: {}", i + 1, sq.question);
+                        println!("     A: {}", sq.answer);
+                    }
+                    println!("Press Enter to continue...");
+                    std::io::stdin().read_line(&mut String::new())?;
+                }
+            }
+            3 => break,
+            _ => {}
+        }
+        println!(); // Add spacing
+    }
+    
+    Ok(())
+}
+
 fn main() {
     let matches = Command::new("pswdstore")
-        .version("0.1.0")
+        .version("0.1.1")
         .about("A PIN-secured CLI password storage tool")
         .arg(
             Arg::new("pin")
@@ -266,9 +323,16 @@ fn main() {
         .arg(
             Arg::new("get")
                 .long("get")
-                .help("Search for password entries")
+                .help("Search for password entries (interactive mode)")
                 .value_name("SEARCH_TERM")
                 .num_args(1),
+        )
+        .arg(
+            Arg::new("list")
+                .long("list")
+                .help("List password entries (safe display)")
+                .value_name("SEARCH_TERM")
+                .num_args(0..=1),
         )
         .get_matches();
 
@@ -315,6 +379,41 @@ fn main() {
         
         if results.is_empty() {
             println!("No entries found matching '{}'", search_term);
+        } else if results.len() == 1 {
+            // Single result - go directly to interaction
+            match handle_entry_interaction(results[0]) {
+                Ok(_) => {},
+                Err(e) => eprintln!("Error: {}", e),
+            }
+        } else {
+            // Multiple results - let user choose
+            println!("Found {} matching entries:", results.len());
+            println!();
+            
+            for (i, entry) in results.iter().enumerate() {
+                println!("{}. {} ({})", i + 1, entry.domain, entry.username);
+            }
+            
+            let selection = Select::new()
+                .with_prompt("Select an entry to interact with")
+                .items(&results.iter().map(|e| format!("{} ({})", e.domain, e.username)).collect::<Vec<_>>())
+                .interact();
+            
+            match selection {
+                Ok(index) => {
+                    match handle_entry_interaction(results[index]) {
+                        Ok(_) => {},
+                        Err(e) => eprintln!("Error: {}", e),
+                    }
+                }
+                Err(e) => eprintln!("Selection error: {}", e),
+            }
+        }
+    } else if let Some(search_term) = matches.get_one::<String>("list") {
+        let results = store.find_entries(search_term);
+        
+        if results.is_empty() {
+            println!("No entries found matching '{}'", search_term);
         } else {
             println!("Found {} matching entr{}:", 
                 results.len(), 
@@ -323,7 +422,19 @@ fn main() {
             println!();
             
             for entry in results {
-                display_entry(entry);
+                display_entry_safely(entry);
+            }
+        }
+    } else if matches.get_flag("list") {
+        // List all entries safely
+        if store.data.is_empty() {
+            println!("No password entries found.");
+        } else {
+            println!("All password entries ({} total):", store.data.len());
+            println!();
+            
+            for entry in &store.data {
+                display_entry_safely(entry);
             }
         }
     } else {

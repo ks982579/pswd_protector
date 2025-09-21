@@ -1,6 +1,6 @@
 [package]
 name = "pswdstore"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
@@ -14,3 +14,4 @@ base64 = "0.22"
 sha2 = "0.10"
 chrono = { version = "0.4", features = ["serde"] }
 whoami = "1.4"
+arboard = "3.2"

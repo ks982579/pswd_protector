@@ -67,6 +67,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Graceful error handling and user feedback
 - Cross-platform compatibility
 
+## [0.1.1] - 2025-01-21
+
+### 🔒 Security (Critical Fix)
+- **FIXED**: Critical security vulnerability where passwords were displayed in terminal output
+- **FIXED**: Passwords no longer stored in terminal history or system logs
+- **ADDED**: Terminal history protection - passwords never displayed unless explicitly requested
+
+### Added
+- Interactive password access with secure options:
+  - Copy to clipboard (most secure option)
+  - Show password with explicit warning and confirmation
+  - Show security questions separately
+- New `--list` command for safe password browsing with hidden passwords
+- Enhanced `--get` command with interactive selection for multiple matches
+- Clipboard integration for secure password copying
+- Multi-step confirmation for password revelation
+- Better handling of multiple accounts for same domain
+
+### Changed
+- Password display behavior completely redesigned for security
+- Search results now show entries safely with passwords hidden by default
+- Interactive menus for password access instead of direct terminal output
+- Improved user experience for multiple matching entries
+
+### Security Enhancements
+- Passwords displayed as `[HIDDEN - use interactive mode to reveal]` in listings
+- Explicit warnings before showing passwords on screen
+- Secure clipboard copying as primary access method
+- Prevention of accidental password exposure in terminal scrollback
+- Interactive confirmation required for any password visibility
+
+### Dependencies
+- **ADDED**: `arboard` 3.2 for secure clipboard functionality
+
 ## [Unreleased]
 
 ### Planned Features
@@ -95,11 +129,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.1.1 | 2025-01-21 | Critical security fix: terminal history protection |
 | 0.1.0 | 2024-01-01 | Initial release with core password storage and encryption |
 
 ---
 
 ## Release Notes
+
+### Version 0.1.1
+
+This is a **critical security update** that addresses a significant vulnerability in password display behavior. **All users should upgrade immediately.**
+
+**🚨 Security Fix:**
+- Resolved critical issue where passwords were displayed directly in terminal output
+- Eliminated risk of passwords being stored in terminal history, system logs, or scrollback buffers
+- Implemented comprehensive terminal history protection
+
+**🔧 Improvements:**
+- Added secure clipboard integration for password access
+- Introduced interactive password handling with explicit user confirmation
+- Enhanced support for multiple accounts per domain
+- Improved overall user experience with safer default behaviors
+
+**📋 New Commands:**
+- `--list`: Browse passwords safely with sensitive data hidden
+- Enhanced `--get`: Interactive mode with clipboard copying and secure reveal options
+
+**⚠️ Breaking Changes:**
+None - all existing commands work the same, but with improved security.
+
+**🔄 Migration:**
+No migration needed. Existing password stores work unchanged with enhanced security.
 
 ### Version 0.1.0
 

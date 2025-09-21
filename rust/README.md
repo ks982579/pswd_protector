@@ -74,10 +74,35 @@ Add a security question? (y/n): n
 ✓ Password entry saved for github.com successfully!
 ```
 
-### Search for Passwords
+### Search for Passwords (Interactive Mode)
 
 ```bash
 pswdstore 1234 --get github
+```
+
+**Single match** - goes directly to interaction menu:
+```
+What would you like to do with github.com?
+❯ Copy password to clipboard
+  Show password (will be visible)
+  Show security questions
+  Back to search results
+```
+
+**Multiple matches** - choose which account:
+```
+Found 2 matching entries:
+
+1. nelnet.com (mom_account)
+2. nelnet.com (my_account)
+
+? Select an entry to interact with ›
+```
+
+### List Passwords (Safe Display)
+
+```bash
+pswdstore 1234 --list github
 ```
 
 Example output:
@@ -86,11 +111,14 @@ Found 1 matching entry:
 
 Domain: github.com
 Username: john_doe
-Password: mySecurePassword123!
+Password: [HIDDEN - use interactive mode to reveal]
 Email: john@example.com
-Security Questions:
-  1. Q: What was your first pet's name?
-     A: Fluffy
+Security Questions: 1 question(s) stored
+```
+
+**List all entries:**
+```bash
+pswdstore 1234 --list
 ```
 
 Search terms match against:
@@ -114,6 +142,9 @@ Search terms match against:
 3. **Secure Key Derivation**: PIN combined with salt for key generation
 4. **Audit Trail**: All operations logged with user and timestamp
 5. **Memory Safety**: Built in Rust for memory-safe operations
+6. **Terminal History Protection**: Passwords never displayed unless explicitly requested
+7. **Clipboard Integration**: Secure password copying without terminal exposure
+8. **Interactive Security**: Multiple confirmation steps for password revelation
 
 ### Wrong PIN Protection
 
@@ -166,7 +197,8 @@ The encrypted JSON file contains:
 |---------|-------------|
 | `pswdstore <pin> --init` | Initialize new password store |
 | `pswdstore <pin> --new` | Add new password entry (interactive) |
-| `pswdstore <pin> --get <term>` | Search for passwords matching term |
+| `pswdstore <pin> --get <term>` | Search for passwords (interactive mode with clipboard/reveal options) |
+| `pswdstore <pin> --list [term]` | List passwords safely (passwords hidden) |
 | `pswdstore --help` | Show help information |
 | `pswdstore --version` | Show version information |
 
@@ -193,21 +225,31 @@ Answer: Smith
 Add a security question? (y/n): n
 ✓ Password entry saved for gmail.com successfully!
 
-# 3. Search for passwords
+# 3. Search for passwords (interactive)
 $ pswdstore mypin123 --get gmail
+What would you like to do with gmail.com?
+❯ Copy password to clipboard
+  Show password (will be visible)
+  Show security questions
+  Back to search results
+
+# 4. List passwords safely
+$ pswdstore mypin123 --list gmail
 Found 1 matching entry:
 
 Domain: gmail.com
 Username: john.doe@gmail.com
-Password: secretPassword456!
-Security Questions:
-  1. Q: Mother's maiden name?
-     A: Smith
+Password: [HIDDEN - use interactive mode to reveal]
+Security Questions: 1 question(s) stored
 
-# 4. Search by username
-$ pswdstore mypin123 --get john.doe
-Found 1 matching entry:
-[same output as above]
+# 5. Handle multiple accounts
+$ pswdstore mypin123 --get nelnet
+Found 2 matching entries:
+
+1. nelnet.com (mom_account)
+2. nelnet.com (my_account)
+
+? Select an entry to interact with ›
 ```
 
 ## File Location
@@ -237,6 +279,7 @@ Since all data is stored in a single encrypted file:
 - `chrono` - Date/time handling
 - `whoami` - User information
 - `dirs` - Directory utilities
+- `arboard` - Secure clipboard integration
 
 ### Building
 
