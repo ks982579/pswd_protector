@@ -538,7 +538,8 @@ fn main() {
                 .long("list")
                 .help("List password entries (safe display)")
                 .value_name("SEARCH_TERM")
-                .num_args(0..=1),
+                .num_args(0..=1)
+                .action(clap::ArgAction::Set),
         )
         .arg(
             Arg::new("update")
@@ -629,32 +630,35 @@ fn main() {
                 Err(e) => eprintln!("Selection error: {}", e),
             }
         }
-    } else if let Some(search_term) = matches.get_one::<String>("list") {
-        let results = store.find_entries(search_term);
-        
-        if results.is_empty() {
-            println!("No entries found matching '{}'", search_term);
-        } else {
-            println!("Found {} matching entr{}:", 
-                results.len(), 
-                if results.len() == 1 { "y" } else { "ies" }
-            );
-            println!();
+    } else if matches.contains_id("list") {
+        if let Some(search_term) = matches.get_one::<String>("list") {
+            // List with search term
+            let results = store.find_entries(search_term);
             
-            for entry in results {
-                display_entry_safely(entry);
+            if results.is_empty() {
+                println!("No entries found matching '{}'", search_term);
+            } else {
+                println!("Found {} matching entr{}:", 
+                    results.len(), 
+                    if results.len() == 1 { "y" } else { "ies" }
+                );
+                println!();
+                
+                for entry in results {
+                    display_entry_safely(entry);
+                }
             }
-        }
-    } else if matches.get_flag("list") {
-        // List all entries safely
-        if store.data.is_empty() {
-            println!("No password entries found.");
         } else {
-            println!("All password entries ({} total):", store.data.len());
-            println!();
-            
-            for entry in &store.data {
-                display_entry_safely(entry);
+            // List all entries safely
+            if store.data.is_empty() {
+                println!("No password entries found.");
+            } else {
+                println!("All password entries ({} total):", store.data.len());
+                println!();
+                
+                for entry in &store.data {
+                    display_entry_safely(entry);
+                }
             }
         }
     } else if let Some(search_term) = matches.get_one::<String>("update") {
