@@ -179,6 +179,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **PIN prompt on application startup**: PIN is no longer required as a command-line argument, eliminating exposure in command history
+- Masked PIN input using asterisks (*) for secure terminal entry
+
+### Changed
+
+- **Breaking Change (Security)**: PIN no longer accepted as command-line argument
+  - Old: `pswdstore 1234 --init`
+  - New: `pswdstore --init` (prompts for PIN with masked input)
+- All commands now prompt for PIN after command selection instead of requiring it upfront
+- Updated all usage documentation to reflect new PIN input behavior
+
+### Security Improvements
+
+- **CRITICAL**: Eliminated PIN exposure in command history, process listings, and shell history
+- PIN input masked with asterisks to prevent shoulder surfing and terminal logging
+- PIN no longer visible in `ps`, `history`, or other process inspection tools
+- Cleaner API that follows security best practices for sensitive credential input
+
 ### Planned Features
 
 - Import/export features

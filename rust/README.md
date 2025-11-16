@@ -63,18 +63,18 @@ The installer will:
 First, create your encrypted password store with a PIN:
 
 ```bash
-pswdstore 1234 --init
+pswdstore --init
 ```
 
-This creates an encrypted file at `~/.pswdstore.json`.
+You'll be prompted to enter your PIN (input will be masked for security). This creates an encrypted file at `~/.pswdstore.json`.
 
 ### Add a New Password
 
 ```bash
-pswdstore 1234 --new
+pswdstore --new
 ```
 
-You'll be prompted interactively for:
+You'll be prompted for your PIN first (masked input), then interactively for:
 
 - Domain (e.g., "github.com")
 - Username
@@ -104,8 +104,10 @@ Add a security question? (y/n): n
 ### Search for Passwords (Interactive Mode)
 
 ```bash
-pswdstore 1234 --get github
+pswdstore --get github
 ```
+
+You'll be prompted to enter your PIN first (masked input).
 
 **Single match** - goes directly to interaction menu:
 
@@ -131,7 +133,7 @@ Found 2 matching entries:
 ### List Passwords (Safe Display)
 
 ```bash
-pswdstore 1234 --list github
+pswdstore --list github
 ```
 
 Example output:
@@ -149,13 +151,13 @@ Security Questions: 1 question(s) stored
 **List all entries:**
 
 ```bash
-pswdstore 1234 --list
+pswdstore --list
 ```
 
 ### Update Password Entries
 
 ```bash
-pswdstore 1234 --update github
+pswdstore --update github
 ```
 
 **Single match** - goes directly to update options:
@@ -187,7 +189,7 @@ Found 2 matching entries:
 ### Delete Password Entries
 
 ```bash
-pswdstore 1234 --destroy github
+pswdstore --destroy github
 ```
 
 **Selection and confirmation process:**
@@ -283,16 +285,16 @@ The encrypted JSON file contains:
 
 ## Command Reference
 
-| Command                            | Description                                                           |
-| ---------------------------------- | --------------------------------------------------------------------- |
-| `pswdstore <pin> --init`           | Initialize new password store                                         |
-| `pswdstore <pin> --new`            | Add new password entry (interactive)                                  |
-| `pswdstore <pin> --get <term>`     | Search for passwords (interactive mode with clipboard/reveal options) |
-| `pswdstore <pin> --list [term]`    | List passwords safely (passwords hidden)                              |
-| `pswdstore <pin> --update <term>`  | Update existing password entry (password/email/security questions)    |
-| `pswdstore <pin> --destroy <term>` | Delete password entry (permanent, with confirmation)                  |
-| `pswdstore --help`                 | Show help information                                                 |
-| `pswdstore --version`              | Show version information                                              |
+| Command                         | Description                                                           |
+| ------------------------------- | --------------------------------------------------------------------- |
+| `pswdstore --init`              | Initialize new password store (prompts for PIN)                       |
+| `pswdstore --new`               | Add new password entry (prompts for PIN, then interactive)            |
+| `pswdstore --get <term>`        | Search for passwords (prompts for PIN, interactive mode)              |
+| `pswdstore --list [term]`       | List passwords safely (prompts for PIN, passwords hidden)             |
+| `pswdstore --update <term>`     | Update existing password entry (prompts for PIN)                      |
+| `pswdstore --destroy <term>`    | Delete password entry (prompts for PIN, with confirmation)            |
+| `pswdstore --help`              | Show help information                                                 |
+| `pswdstore --version`           | Show version information                                              |
 
 ## Examples
 
@@ -300,11 +302,13 @@ The encrypted JSON file contains:
 
 ```bash
 # 1. Initialize store
-$ pswdstore mypin123 --init
+$ pswdstore --init
+Enter PIN: ****
 ✓ Password store initialized successfully!
 
 # 2. Add a password
-$ pswdstore mypin123 --new
+$ pswdstore --new
+Enter PIN: ****
 Creating new password entry...
 Domain (e.g., github.com): gmail.com
 Username: john.doe@gmail.com
@@ -318,7 +322,8 @@ Add a security question? (y/n): n
 ✓ Password entry saved for gmail.com successfully!
 
 # 3. Search for passwords (interactive)
-$ pswdstore mypin123 --get gmail
+$ pswdstore --get gmail
+Enter PIN: ****
 What would you like to do with gmail.com?
 ❯ Copy password to clipboard
   Show password (will be visible)
@@ -326,7 +331,8 @@ What would you like to do with gmail.com?
   Back to search results
 
 # 4. List passwords safely
-$ pswdstore mypin123 --list gmail
+$ pswdstore --list gmail
+Enter PIN: ****
 Found 1 matching entry:
 
 Domain: gmail.com
@@ -335,7 +341,8 @@ Password: [HIDDEN - use interactive mode to reveal]
 Security Questions: 1 question(s) stored
 
 # 5. Handle multiple accounts
-$ pswdstore mypin123 --get nelnet
+$ pswdstore --get nelnet
+Enter PIN: ****
 Found 2 matching entries:
 
 1. nelnet.com (mom_account)
@@ -344,7 +351,8 @@ Found 2 matching entries:
 ? Select an entry to interact with ›
 
 # 6. Update a password
-$ pswdstore mypin123 --update gmail
+$ pswdstore --update gmail
+Enter PIN: ****
 What would you like to update for john.doe@gmail.com (gmail.com)?
 ❯ Update password
   Update email
@@ -352,7 +360,8 @@ What would you like to update for john.doe@gmail.com (gmail.com)?
   Cancel
 
 # 7. Delete an entry (careful!)
-$ pswdstore mypin123 --destroy old-site
+$ pswdstore --destroy old-site
+Enter PIN: ****
 ⚠️  You are about to delete:
 Domain: old-site.com
 Username: old_user
@@ -429,7 +438,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **"Password store not found"**
 
-- Run `pswdstore <pin> --init` first
+- Run `pswdstore --init` first
 
 **"Invalid PIN"**
 

@@ -84,7 +84,7 @@ impl PasswordStore {
 
     fn load_encrypted(path: &PathBuf, pin: &str) -> Result<Self, Box<dyn std::error::Error>> {
         if !path.exists() {
-            return Err("Password store not found. Run 'pswdstore <pin> --init' first.".into());
+            return Err("Password store not found. Run 'pswdstore --init' first.".into());
         }
         
         let encrypted_content = fs::read_to_string(path)?;
@@ -509,12 +509,6 @@ fn main() {
         .version("0.1.3")
         .about("A PIN-secured CLI password storage tool")
         .arg(
-            Arg::new("pin")
-                .help("PIN to access the password store")
-                .required(true)
-                .index(1),
-        )
-        .arg(
             Arg::new("init")
                 .long("init")
                 .help("Initialize a new password store")
@@ -557,7 +551,15 @@ fn main() {
         )
         .get_matches();
 
-    let pin = matches.get_one::<String>("pin").unwrap();
+    // Prompt for PIN with masked input instead of command-line argument
+    let pin = Password::new()
+        .with_prompt("Enter PIN")
+        .interact()
+        .unwrap_or_else(|_| {
+            eprintln!("Error reading PIN");
+            std::process::exit(1);
+        });
+
     let storage_path = get_storage_path();
 
     if matches.get_flag("init") {
@@ -566,16 +568,16 @@ fn main() {
             eprintln!("Remove the existing file if you want to reinitialize.");
             return;
         }
-        
-        let store = PasswordStore::new(pin);
-        match store.save_encrypted(&storage_path, pin) {
+
+        let store = PasswordStore::new(&pin);
+        match store.save_encrypted(&storage_path, &pin) {
             Ok(_) => println!("✓ Password store initialized successfully!"),
             Err(e) => eprintln!("Error initializing password store: {}", e),
         }
         return;
     }
 
-    let mut store = match PasswordStore::load_encrypted(&storage_path, pin) {
+    let mut store = match PasswordStore::load_encrypted(&storage_path, &pin) {
         Ok(store) => store,
         Err(e) => {
             eprintln!("Error: {}", e);
@@ -587,8 +589,8 @@ fn main() {
         match interactive_new_entry() {
             Ok(entry) => {
                 store.add_entry(entry.clone());
-                
-                match store.save_encrypted(&storage_path, pin) {
+
+                match store.save_encrypted(&storage_path, &pin) {
                     Ok(_) => println!("\n✓ Password entry saved for {} successfully!", entry.domain),
                     Err(e) => eprintln!("Error saving password entry: {}", e),
                 }
@@ -664,7 +666,7 @@ fn main() {
     } else if let Some(search_term) = matches.get_one::<String>("update") {
         match handle_update_entry(&mut store, search_term) {
             Ok(_) => {
-                match store.save_encrypted(&storage_path, pin) {
+                match store.save_encrypted(&storage_path, &pin) {
                     Ok(_) => {},
                     Err(e) => eprintln!("Error saving updated password store: {}", e),
                 }
@@ -674,7 +676,7 @@ fn main() {
     } else if let Some(search_term) = matches.get_one::<String>("destroy") {
         match handle_delete_entry(&mut store, search_term) {
             Ok(_) => {
-                match store.save_encrypted(&storage_path, pin) {
+                match store.save_encrypted(&storage_path, &pin) {
                     Ok(_) => {},
                     Err(e) => eprintln!("Error saving password store after deletion: {}", e),
                 }
