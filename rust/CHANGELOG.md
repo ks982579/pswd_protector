@@ -177,7 +177,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installation directory creation if needed
 - Comprehensive pre-flight checks (Rust installation, project structure)
 
-## [Unreleased]
+## [0.1.4] - 2025-11-16
 
 ### Added
 
@@ -198,6 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PIN input masked with asterisks to prevent shoulder surfing and terminal logging
 - PIN no longer visible in `ps`, `history`, or other process inspection tools
 - Cleaner API that follows security best practices for sensitive credential input
+
+## [Unreleased]
 
 ### Planned Features
 
@@ -223,16 +225,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Summary
 
-| Version | Date       | Description                                                  |
-| ------- | ---------- | ------------------------------------------------------------ |
-| 0.1.3   | 2025-09-21 | Added Linux installer script for easy installation           |
-| 0.1.2   | 2025-09-21 | Added update and delete functionality with enhanced security |
-| 0.1.1   | 2025-09-21 | Critical security fix: terminal history protection           |
-| 0.1.0   | 2024-09-21 | Initial release with core password storage and encryption    |
+| Version | Date       | Description                                                   |
+| ------- | ---------- | ------------------------------------------------------------- |
+| 0.1.4   | 2025-11-16 | Moved Pin requirement into application for enchanced security |
+| 0.1.3   | 2025-09-21 | Added Linux installer script for easy installation            |
+| 0.1.2   | 2025-09-21 | Added update and delete functionality with enhanced security  |
+| 0.1.1   | 2025-09-21 | Critical security fix: terminal history protection            |
+| 0.1.0   | 2024-09-21 | Initial release with core password storage and encryption     |
 
 ---
 
 ## Release Notes
+
+### Version 0.1.4
+
+This release is just to fix the security issue of requiring the pin to be put into the terminal in plain text.
 
 ### Version 0.1.3
 
